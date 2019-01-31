@@ -4,6 +4,7 @@ const
   bodyParser = require('body-parser');
 
 const app = express();
+const mongoConnect = require('./util/database').mongoConnect;
 
 app.set('view engine', 'ejs');
 
@@ -22,4 +23,6 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-app.listen(3000);
+mongoConnect(client => {
+  app.listen(3000);
+})

@@ -3,7 +3,7 @@ const
 
 exports.getProducts = (req, res) => {
   Product
-    .findAll()
+    .fetchAll()
     .then(products => {
       res.render('shop/product-list', {
         products: products,
