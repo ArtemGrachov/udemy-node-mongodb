@@ -7,13 +7,15 @@ class Product {
     price,
     description,
     imageUrl,
-    id
+    id,
+    userId
   ) {
     this.title = title;
     this.price = price;
     this.description = description;
     this.imageUrl = imageUrl;
     this._id = id ? new mongodb.ObjectId(id) : null;
+    this.userId = userId;
   }
 
   save() {
@@ -45,10 +47,9 @@ class Product {
     const db = getDb();
     return db
       .collection('products')
-      .find({
+      .findOne({
         _id: new mongodb.ObjectId(productId)
       })
-      .next()
       .catch(err => console.log(err))
   }
 

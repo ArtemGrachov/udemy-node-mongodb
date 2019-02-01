@@ -13,6 +13,17 @@ const adminRoutes = require('./routes/admin'),
 
 const errorController = require('./controllers/error');
 
+const User = require('./models/user');
+
+app.use((req, res, next) => {
+  User.findById('5c54613eec3a5094441afd06')
+    .then(user => {
+      req.user = Object.assign(new User(), user);
+      next();
+    })
+    .catch(err => console.log(err))
+})
+
 app.use(bodyParser.urlencoded({
   extended: false
 }));
@@ -24,5 +35,6 @@ app.use(shopRoutes);
 app.use(errorController.get404);
 
 mongoConnect(client => {
+
   app.listen(3000);
 })
