@@ -43,16 +43,12 @@ exports.getCart = (req, res) => {
   req
     .user
     .getCart()
-    .then(cart => {
-      return cart
-        .getProducts()
-        .then(products => {
-          res.render('shop/cart', {
-            pageTitle: 'Your cart',
-            path: 'shop/cart',
-            products: products
-          });
-        });
+    .then(products => {
+      res.render('shop/cart', {
+        pageTitle: 'Your cart',
+        path: 'shop/cart',
+        products: products
+      });
     })
     .catch(err => console.log(err));
 };
@@ -98,10 +94,6 @@ exports.postOrder = (req, res) => {
   req
     .user
     .getCart()
-    .then(cart => {
-      fetchedCart = cart;
-      return cart.getProducts();
-    })
     .then(products => {
       return req
         .user
