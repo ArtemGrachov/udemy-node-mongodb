@@ -13,9 +13,10 @@ const userSchema = new Schema({
   },
   cart: {
     items: [{
-      productId: {
+      product: {
         type: Schema.Types.ObjectId,
-        required: true
+        required: true,
+        ref: 'Product'
       },
       quantity: {
         type: Number,
@@ -23,6 +24,29 @@ const userSchema = new Schema({
       }
     }]
   }
-})
+});
+
+userSchema.methods.addToCart = function (product) {
+  const cartProductIndex = this
+    .cart
+    .items
+    .findIndex(item => item.product.toString() === product._id.toString());
+  const updatedCartItems = [...this.cart.items];
+  if (cartProductIndex !== -1) {
+    updatedCartItems[cartProductIndex].quantity = this.cart.items[cartProductIndex].quantity + 1
+  } else {
+    updatedCartItems.push({
+      product: product._id,
+      quantity: 1
+    })
+  }
+
+  const updatedCart = {
+    items: updatedCartItems
+  };
+
+  this.cart = updatedCart;
+  return this.save();
+}
 
 module.exports = mongoose.model('User', userSchema);

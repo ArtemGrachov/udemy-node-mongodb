@@ -18,7 +18,8 @@ exports.postAddProduct = (req, res) => {
       title,
       price,
       imageUrl,
-      description
+      description,
+      userId: req.user
     })
     .save()
     .then(result => res.redirect('/admin/products'))
@@ -68,7 +69,6 @@ exports.postEditProduct = (req, res) => {
 
 exports.getProducts = (req, res) => {
   Product
-    .find()
     .then(products => {
       res.render('admin/product-list', {
         products: products,

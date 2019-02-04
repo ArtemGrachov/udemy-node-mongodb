@@ -32,6 +32,7 @@ app.use((req, res, next) => {
           }
         }).save()
       }
+      return user;
     })
     .then(user => {
       req.user = user;
