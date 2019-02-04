@@ -1,10 +1,10 @@
 const
   path = require('path'),
   express = require('express'),
+  mongoose = require('mongoose'),
   bodyParser = require('body-parser');
 
 const app = express();
-const mongoConnect = require('./util/database').mongoConnect;
 
 app.set('view engine', 'ejs');
 
@@ -12,17 +12,6 @@ const adminRoutes = require('./routes/admin'),
   shopRoutes = require('./routes/shop');
 
 const errorController = require('./controllers/error');
-
-const User = require('./models/user');
-
-app.use((req, res, next) => {
-  User.findById('5c54613eec3a5094441afd06')
-    .then(user => {
-      req.user = Object.assign(new User(), user);
-      next();
-    })
-    .catch(err => console.log(err))
-})
 
 app.use(bodyParser.urlencoded({
   extended: false
@@ -34,7 +23,7 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-mongoConnect(client => {
-
-  app.listen(3000);
-})
+mongoose
+  .connect('mongodb://localhost:27017/udemy-node')
+  .then(result => app.listen(3000))
+  .catch(error => console.log(error));

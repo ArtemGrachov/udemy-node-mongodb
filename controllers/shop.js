@@ -3,7 +3,7 @@ const
 
 exports.getProducts = (req, res) => {
   Product
-    .fetchAll()
+    .find()
     .then(products => {
       res.render('shop/product-list', {
         products: products,
@@ -29,7 +29,7 @@ exports.getProduct = (req, res) => {
 
 exports.getIndex = (req, res) => {
   Product
-    .findAll()
+    .find()
     .then(products => {
       res.render('shop/product-list', {
         products: products,
