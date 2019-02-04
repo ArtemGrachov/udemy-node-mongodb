@@ -2,9 +2,18 @@ const
   path = require('path'),
   express = require('express'),
   mongoose = require('mongoose'),
-  bodyParser = require('body-parser');
+  bodyParser = require('body-parser'),
+  session = require('express-session'),
+  MongoDBStore = require('connect-mongodb-session')(session);
 
 const app = express();
+
+const MONGODB_URI = 'mongodb://localhost:27017/udemy-node';
+
+const store = new MongoDBStore({
+  uri: MONGODB_URI,
+  collection: 'sessions'
+});
 
 app.set('view engine', 'ejs');
 
@@ -20,6 +29,13 @@ app.use(bodyParser.urlencoded({
 app.use(express.static(path.join(__dirname, 'public')));
 
 const User = require('./models/user');
+
+app.use(session({
+  secret: 'secret key',
+  resave: false,
+  saveUninitialized: false,
+  store
+}));
 
 app.use((req, res, next) => {
   User.findOne()
@@ -50,6 +66,6 @@ app.use(errorController.get404);
 
 
 mongoose
-  .connect('mongodb://localhost:27017/udemy-node')
+  .connect(MONGODB_URI)
   .then(result => app.listen(3000))
   .catch(error => console.log(error));
