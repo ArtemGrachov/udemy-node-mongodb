@@ -18,10 +18,33 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+const User = require('./models/user');
+
+app.use((req, res, next) => {
+  User.findOne()
+    .then(user => {
+      if (!user) {
+        return new User({
+          name: 'user',
+          email: 'user@email',
+          cart: {
+            items: []
+          }
+        }).save()
+      }
+    })
+    .then(user => {
+      req.user = user;
+      next();
+    })
+    .catch(err => console.log(err));
+})
+
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
 app.use(errorController.get404);
+
 
 mongoose
   .connect('mongodb://localhost:27017/udemy-node')
