@@ -103,20 +103,20 @@ exports.postOrder = (req, res) => {
       })
       return order.save()
     })
+    .then(result => req.user.clearCart())
     .then(result => res.redirect('/orders'))
     .catch(err => console.log(err))
 }
 
 exports.getOrders = (req, res) => {
-  req
-    .user
-    .populate('orders')
-    .execPopulate()
-    .then(user => {
+  Order.find({
+      'user.userId': req.user._id
+    })
+    .then(orders => {
       res.render('shop/orders', {
         pageTitle: 'Orders',
         path: 'shop/orders',
-        orders: user.orders
+        orders
       });
     })
     .catch(err => console.log(err));
