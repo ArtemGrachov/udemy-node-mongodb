@@ -9,7 +9,8 @@ const app = express();
 app.set('view engine', 'ejs');
 
 const adminRoutes = require('./routes/admin'),
-  shopRoutes = require('./routes/shop');
+  shopRoutes = require('./routes/shop'),
+  authRoutes = require('./routes/auth');
 
 const errorController = require('./controllers/error');
 
@@ -43,6 +44,7 @@ app.use((req, res, next) => {
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use(errorController.get404);
 
