@@ -9,7 +9,7 @@ exports.getProducts = (req, res) => {
       res.render('shop/product-list', {
         products: products,
         pageTitle: 'All products',
-        path: '/',
+        path: '/products',
         isAuthenticated: req.session.isLoggedIn
       })
     })
@@ -51,20 +51,12 @@ exports.getCart = (req, res) => {
     .then(user => {
       res.render('shop/cart', {
         pageTitle: 'Your cart',
-        path: 'shop/cart',
+        path: '/cart',
         products: user.cart.items,
         isAuthenticated: req.session.isLoggedIn
       });
     })
     .catch(err => console.log(err));
-};
-
-exports.getCheckout = (req, res) => {
-  res.render('shop/checkout', {
-    pageTitle: 'Checkout',
-    path: 'shop/checkout',
-    isAuthenticated: req.session.isLoggedIn
-  });
 };
 
 exports.postCart = (req, res) => {
@@ -120,7 +112,7 @@ exports.getOrders = (req, res) => {
     .then(orders => {
       res.render('shop/orders', {
         pageTitle: 'Orders',
-        path: 'shop/orders',
+        path: '/orders',
         isAuthenticated: req.session.isLoggedIn,
         orders
       });

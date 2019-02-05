@@ -51,33 +51,11 @@ app.use((req, res, next) => {
   }
 })
 
-app.use((req, res, next) => {
-  User.findOne()
-    .then(user => {
-      if (!user) {
-        return new User({
-          name: 'user',
-          email: 'user@email',
-          cart: {
-            items: []
-          }
-        }).save()
-      }
-      return user;
-    })
-    .then(user => {
-      req.user = user;
-      next();
-    })
-    .catch(err => console.log(err));
-})
-
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
 app.use(errorController.get404);
-
 
 mongoose
   .connect(MONGODB_URI)
