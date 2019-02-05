@@ -38,6 +38,20 @@ app.use(session({
 }));
 
 app.use((req, res, next) => {
+  if (!req.session.user) {
+    next();
+  } else {
+    User
+      .find(req.session.user._id)
+      .then(user => {
+        req.user = user;
+        next();
+      })
+      .catch(err => console.log(err))
+  }
+})
+
+app.use((req, res, next) => {
   User.findOne()
     .then(user => {
       if (!user) {
