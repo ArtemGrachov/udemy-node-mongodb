@@ -17,6 +17,7 @@ exports.postLogin = (req, res) => {
     })
     .then(user => {
       if (!user) {
+        req.flash('error', 'Invalid email or password');
         return res.redirect('/login');
       }
       return bcrypt.compare(password, user.password)
@@ -28,10 +29,12 @@ exports.postLogin = (req, res) => {
               return res.redirect('/');
             })
           }
+          req.flash('error', 'Invalid email or password');
           return res.redirect('/login');
         })
         .catch(err => {
           console.log(err);
+          req.flash('error', 'Invalid email or password');
           return res.redirect('/login')
         });
     })
@@ -60,6 +63,7 @@ exports.postSignUp = (req, res) => {
     })
     .then(userDoc => {
       if (userDoc) {
+        req.flash('error', 'User already exists');
         return res.redirect('/signup');
       }
       return bcrypt.hash(password, 12)

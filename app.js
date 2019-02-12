@@ -5,7 +5,8 @@ const
   bodyParser = require('body-parser'),
   session = require('express-session'),
   csrf = require('csurf'),
-  MongoDBStore = require('connect-mongodb-session')(session);
+  MongoDBStore = require('connect-mongodb-session')(session),
+  flash = require('connect-flash');
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const csrfProtection = csrf();
 
 app.use(csrfProtection);
+app.use(flash());
 
 const User = require('./models/user');
 
@@ -60,6 +62,8 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;
   res.locals.csrfToken = req.csrfToken();
+  const errMessages = req.flash('error');
+  res.locals.errorMessage = errMessages.length ? errMessages : null;
   next();
 })
 

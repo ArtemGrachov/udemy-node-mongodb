@@ -53,3 +53,8 @@
     </ul>
   </nav>
 </header>
+<% if (errorMessage) { %>
+  <div class="user-message user-message--error">
+    <%= errorMessage %>
+  </div>
+<% } %>
