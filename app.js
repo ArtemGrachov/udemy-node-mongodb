@@ -4,6 +4,7 @@ const
   mongoose = require('mongoose'),
   bodyParser = require('body-parser'),
   session = require('express-session'),
+  csrf = require('csurf'),
   MongoDBStore = require('connect-mongodb-session')(session);
 
 const app = express();
@@ -15,11 +16,19 @@ const store = new MongoDBStore({
   collection: 'sessions'
 });
 
+app.use(session({
+  secret: 'secret key',
+  resave: false,
+  saveUninitialized: false,
+  store
+}));
+
+
 app.set('view engine', 'ejs');
 
 const adminRoutes = require('./routes/admin'),
-  shopRoutes = require('./routes/shop'),
-  authRoutes = require('./routes/auth');
+shopRoutes = require('./routes/shop'),
+authRoutes = require('./routes/auth');
 
 const errorController = require('./controllers/error');
 
@@ -28,14 +37,11 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-const User = require('./models/user');
+const csrfProtection = csrf();
 
-app.use(session({
-  secret: 'secret key',
-  resave: false,
-  saveUninitialized: false,
-  store
-}));
+app.use(csrfProtection);
+
+const User = require('./models/user');
 
 app.use((req, res, next) => {
   if (!req.session.user) {
@@ -49,6 +55,12 @@ app.use((req, res, next) => {
       })
       .catch(err => console.log(err))
   }
+})
+
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
 })
 
 app.use('/admin', adminRoutes);
