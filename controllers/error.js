@@ -6,3 +6,12 @@ exports.get404 = (req, res) => {
       path: null
     });
 }
+
+exports.getError = (err, req, res, next) => {
+  res
+    .status(err.httpStatusCode)
+    .render('error', {
+      pageTitle: `Error${err.httpStatusCode ? ' ' + err.httpStatusCode : ''}`,
+      path: '/error'
+    });
+}

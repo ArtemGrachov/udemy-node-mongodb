@@ -46,16 +46,19 @@ const User = require('./models/user');
 
 app.use((req, res, next) => {
   if (!req.session.user) {
-    next();
-  } else {
-    User
-      .findById(req.session.user._id)
-      .then(user => {
-        req.user = user;
-        next();
-      })
-      .catch(err => console.log(err))
+    return next();
   }
+
+  User
+    .findById(req.session.user._id)
+    .then(user => {
+      if (!user) return next();
+      req.user = user;
+      next();
+    })
+    .catch(err => {
+      throw new Error(err);
+    })
 })
 
 app.use((req, res, next) => {
@@ -71,6 +74,7 @@ app.use(shopRoutes);
 app.use(authRoutes);
 
 app.use(errorController.get404);
+app.use(errorController.getError);
 
 mongoose
   .connect(MONGODB_URI)
