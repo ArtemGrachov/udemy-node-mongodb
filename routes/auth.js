@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const {
   check,
   body
@@ -11,7 +12,32 @@ const router = express.Router();
 
 router.get('/login', authController.getLogin);
 
-router.post('/login', authController.postLogin);
+router.post(
+  '/login',
+  check('email')
+    .isEmail()
+    .withMessage('Please enter an valid email'),
+  body('email')
+    .custom((value, { req }) => {
+      return User.findOne({ email: value})
+        .then(userDoc => {
+          if (userDoc) return userDoc;
+          return Promise.reject('Invalid email or password');
+        })
+        .then(userDoc => {
+          return bcrypt.compare(req.body.password, userDoc.password)
+          .then(match => {
+            if (match) req.user = userDoc;
+            return match;
+          });
+        })
+        .then(match => {
+          if (match) return true;
+          return Promise.reject('Invalid email or password');
+        })
+    }),
+  authController.postLogin
+);
 
 router.post('/logout', authController.postLogout);
 
@@ -20,34 +46,35 @@ router.get('/signup', authController.getSignUp);
 router.post(
   '/signup',
   check('email')
-  .isEmail()
-  .withMessage('Please enter an valid email')
-  .custom((value) => {
-    return User.findOne({ email: value })
-      .then(userDoc => {
-        if (userDoc) {
-          return Promise.reject('User already exists')
-        }
-        return true;
-      })
+    .isEmail()
+    .withMessage('Please enter an valid email')
+    .custom((value) => {
+      return User.findOne({ email: value })
+        .then(userDoc => {
+          if (userDoc) {
+            return Promise.reject('User already exists')
+          }
+          return true;
+        })
   }),
   body(
     'password',
     'Please enter a password with at least 5 characters'
-  ).isLength({
-    min: 5
-  }),
+  )
+    .isLength({
+      min: 5
+    }),
   body(
     'confirmPassword'
   )
-  .custom((value, {
-    req
-  }) => {
-    if (value !== req.body.password) {
-      throw new Error('Passwords have to match');
-    }
-    return true;
-  }),
+    .custom((value, {
+      req
+    }) => {
+      if (value !== req.body.password) {
+        throw new Error('Passwords have to match');
+      }
+      return true;
+    }),
   authController.postSignUp
 );
 

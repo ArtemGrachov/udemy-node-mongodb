@@ -18,40 +18,38 @@ const transporter = nodemailer.createTransport(sendgridTransport({
 exports.getLogin = (req, res) => {
   res.render('auth/login', {
     path: '/login',
-    pageTitle: 'Login'
+    pageTitle: 'Login',
+    oldInput: {
+      email: ''
+    },
+    validationErrorMessages: []
   })
 }
 
 exports.postLogin = (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  User
-    .findOne({
-      email
-    })
-    .then(user => {
-      if (!user) {
-        req.flash('error', 'Invalid email or password');
-        return res.redirect('/login');
-      }
-      return bcrypt.compare(password, user.password)
-        .then(doMatch => {
-          if (doMatch) {
-            req.session.isLoggedIn = true;
-            req.session.user = user;
-            return req.session.save(err => {
-              return res.redirect('/');
-            })
-          }
-          req.flash('error', 'Invalid email or password');
-          return res.redirect('/login');
-        })
-        .catch(err => {
-          console.log(err);
-          req.flash('error', 'Invalid email or password');
-          return res.redirect('/login')
-        });
-    })
+
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res
+      .status(422)
+      .render('auth/login', {
+        path: '/login',
+        pageTitle: 'Login',
+        validationErrorMessages: errors.array(),
+        oldInput: {
+          email
+        }
+      })
+  }
+  
+  req.session.isLoggedIn = true;
+  req.session.user = req.user;
+  req.session.save(err => {
+    return res.redirect('/');
+  })
 }
 
 exports.postLogout = (req, res) => {
