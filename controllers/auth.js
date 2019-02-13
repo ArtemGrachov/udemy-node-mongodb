@@ -63,7 +63,11 @@ exports.postLogout = (req, res) => {
 exports.getSignUp = (req, res) => {
   res.render('auth/signup', {
     path: '/signup',
-    pageTitle: 'Signup'
+    pageTitle: 'Signup',
+    oldInput: {
+      email: ''
+    },
+    validationErrorMessages: null
   })
 }
 
@@ -76,7 +80,10 @@ exports.postSignUp = (req, res) => {
     return res.status(422).render('auth/signup', {
       path: '/signup',
       pageTitle: 'Signup',
-      validationErrorMessages: errors.array()
+      validationErrorMessages: errors.array(),
+      oldInput: {
+        email
+      }
     });
   }
 
