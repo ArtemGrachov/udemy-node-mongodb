@@ -1,0 +1,20 @@
+<%
+  if (validationErrorMessages && validationErrorMessages.length) { 
+%>
+  <ul class="validation-errors-list">
+
+    <%
+    validationErrorMessages.forEach(errorMessage => {
+      %>
+      <li class="validation-errors-item">
+        <div class="validation-error">
+          <%= errorMessage.msg %>
+        </div>
+      </li>
+<%
+    })
+%>
+  </ul>
+  <%
+  }
+%>

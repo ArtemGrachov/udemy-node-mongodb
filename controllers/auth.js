@@ -3,9 +3,7 @@ const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
 const crypto = require('crypto');
 const User = require('../models/user');
-const {
-  validationResult
-} = require('express-validator/check');
+const { validationResult } = require('express-validator/check');
 
 const sendGridApiKey = process.env.SENDGRID_API_KEY;
 
