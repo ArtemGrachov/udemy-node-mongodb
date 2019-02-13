@@ -21,7 +21,7 @@ router.post(
   '/signup',
   check('email')
   .isEmail()
-  .withMessage('Please enter as valid email')
+  .withMessage('Please enter an valid email')
   .custom((value) => {
     return User.findOne({ email: value })
       .then(userDoc => {
