@@ -3,6 +3,9 @@ const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
 const crypto = require('crypto');
 const User = require('../models/user');
+const {
+  validationResult
+} = require('express-validator/check');
 
 const sendGridApiKey = process.env.SENDGRID_API_KEY;
 
@@ -68,6 +71,14 @@ exports.postSignUp = (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const confirmPassword = req.body.confirmPassword;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).render('auth/signup', {
+      path: '/signup',
+      pageTitle: 'Signup',
+      validationErrorMessages: errors.array()
+    });
+  }
 
   User.findOne({
       email
