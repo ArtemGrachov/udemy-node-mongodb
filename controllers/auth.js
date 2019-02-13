@@ -130,14 +130,12 @@ exports.postReset = (req, res, next) => {
       })
       .then(result => {
         res.redirect('/');
-        console.log(token)
-        // transporter.sendMail({
-        //   to: req.body.email,
-        //   from: 'udemy-node@test.test',
-        //   subject: 'Udemy Node.js Tutorial Shop - Password Reset',
-        //   html: `<p>You requested password reset</p><p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password.</p>`
-        // })
-
+        transporter.sendMail({
+          to: req.body.email,
+          from: 'udemy-node@test.test',
+          subject: 'Udemy Node.js Tutorial Shop - Password Reset',
+          html: `<p>You requested password reset</p><p>Click this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password.</p>`
+        })
       })
       .catch(err => console.log(err))
   })
