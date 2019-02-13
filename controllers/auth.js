@@ -70,8 +70,8 @@ exports.getSignUp = (req, res) => {
 exports.postSignUp = (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const confirmPassword = req.body.confirmPassword;
   const errors = validationResult(req);
+
   if (!errors.isEmpty()) {
     return res.status(422).render('auth/signup', {
       path: '/signup',
@@ -80,36 +80,27 @@ exports.postSignUp = (req, res) => {
     });
   }
 
-  User.findOne({
-      email
+  bcrypt.hash(password, 12)
+    .then(hash => {
+      const user = new User({
+        email: email,
+        password: hash,
+        cart: {
+          items: []
+        }
+      })
+      return user.save();
     })
-    .then(userDoc => {
-      if (userDoc) {
-        req.flash('error', 'User already exists');
-        return res.redirect('/signup');
-      }
-      return bcrypt.hash(password, 12)
-        .then(hash => {
-          const user = new User({
-            email: email,
-            password: hash,
-            cart: {
-              items: []
-            }
-          })
-          return user.save();
-        })
-        .then(result => {
-          transporter.sendMail({
-            to: email,
-            from: 'udemy-node@test.test',
-            subject: 'Udemy Node.js Tutorial Shop - Sign Up',
-            html: '<h1>You successfully signed up!</h1>'
-          });
-          res.redirect('/login')
-        })
+    .then(result => {
+      transporter.sendMail({
+        to: email,
+        from: 'udemy-node@test.test',
+        subject: 'Udemy Node.js Tutorial Shop - Sign Up',
+        html: '<h1>You successfully signed up!</h1>'
+      });
+      res.redirect('/login')
     })
-    .catch(err => console.log(err));
+    .catch(err => console.log(err))
 }
 
 exports.getReset = (req, res, next) => {
