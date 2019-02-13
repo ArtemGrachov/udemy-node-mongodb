@@ -67,7 +67,7 @@ exports.getSignUp = (req, res) => {
     oldInput: {
       email: ''
     },
-    validationErrorMessages: null
+    validationErrorMessages: []
   })
 }
 

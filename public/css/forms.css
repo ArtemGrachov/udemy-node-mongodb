@@ -21,3 +21,16 @@
 .form-control textarea:focus {
   outline-color: #00695c;
 }
+
+.form-control input.invalid {
+  border-color: red;
+}
+
+.validation-errors-list {
+  list-style: none;
+  padding: 10px;
+  border-color: red;
+  background: rgb(255, 176, 176);
+  color: rgb(49, 23, 23);
+  text-align: center;
+}
