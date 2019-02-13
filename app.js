@@ -24,12 +24,11 @@ app.use(session({
   store
 }));
 
-
 app.set('view engine', 'ejs');
 
 const adminRoutes = require('./routes/admin'),
-shopRoutes = require('./routes/shop'),
-authRoutes = require('./routes/auth');
+  shopRoutes = require('./routes/shop'),
+  authRoutes = require('./routes/auth');
 
 const errorController = require('./controllers/error');
 
