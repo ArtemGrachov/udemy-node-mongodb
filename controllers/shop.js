@@ -3,16 +3,33 @@ const
   path = require('path'),
   PDFDocument = require('pdfkit'),
   Product = require('../models/product'),
-  Order = require('../models/order');
+  Order = require('../models/order'),
+  paginationHelper = require('../util/pagination');
+
+const ITEMS_PER_PAGE = 2;
 
 exports.getProducts = (req, res) => {
+  const currentPage = +req.query.page || 1;
+  let totalProducts;
+
   Product
     .find()
+    .countDocuments()
+    .then(
+      productsCount => {
+        totalProducts = productsCount;
+        return Product
+          .find()
+          .skip((currentPage - 1) * ITEMS_PER_PAGE)
+          .limit(ITEMS_PER_PAGE)
+      }
+    )
     .then(products => {
       res.render('shop/product-list', {
         products: products,
         pageTitle: 'All products',
-        path: '/products'
+        path: '/products',
+        pagination: paginationHelper.paginationFactory(totalProducts, ITEMS_PER_PAGE, currentPage)
       })
     })
 };
@@ -36,13 +53,29 @@ exports.getProduct = (req, res, next) => {
 }
 
 exports.getIndex = (req, res, next) => {
+  const currentPage = +req.query.page || 1;
+  let totalProducts;
+
   Product
     .find()
+    .countDocuments()
+    .then(
+      productsCount => {
+        totalProducts = productsCount;
+        return Product
+          .find()
+          .skip((currentPage - 1) * ITEMS_PER_PAGE)
+          .limit(ITEMS_PER_PAGE)
+      }
+    )
     .then(products => {
-      res.render('shop/product-list', {
-        products: products,
+      res.render('shop/index', {
+        products,
         pageTitle: 'All products',
-        path: '/'
+        path: '/',
+        currentPage,
+        totalProducts,
+        pagination: paginationHelper.paginationFactory(totalProducts, ITEMS_PER_PAGE, currentPage)
       })
     })
     .catch(err => {
