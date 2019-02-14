@@ -8,9 +8,13 @@ exports.get404 = (req, res) => {
 }
 
 exports.getError = (err, req, res, next) => {
+  console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+  console.log(err)
+  console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!')
   res
     .status(err.httpStatusCode)
     .render('error', {
+      isAuthenticated: req.session.isLoggedIn,
       pageTitle: `Error${err.httpStatusCode ? ' ' + err.httpStatusCode : ''}`,
       path: '/error'
     });

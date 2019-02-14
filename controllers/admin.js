@@ -21,10 +21,20 @@ exports.postAddProduct = (req, res, next) => {
 
   const title = req.body.title,
     price = +req.body.price,
-    imageUrl = req.body.imageUrl,
+    image = req.file,
     description = req.body.description;
 
-    if (!errors.isEmpty()) {
+  const errorsArr = [];
+
+  if (!image) {
+    errorsArr.push({ msg: 'Attached file is not and image' });
+  }
+
+  if (!errors.isEmpty()) {
+    errorsArr = errorsArr.concat(errors.array)
+  }
+
+  if (errorsArr.length) {
     return res
       .status(422)
       .render('admin/edit-product', {
@@ -34,12 +44,13 @@ exports.postAddProduct = (req, res, next) => {
         oldValue: {
           title,
           price,
-          imageUrl,
           description
         },
-        validationErrorMessages: errors.array()
+        validationErrorMessages: errorsArr
       })
   }
+
+  const imageUrl = image.path;
 
   new Product({
     title,
@@ -90,7 +101,7 @@ exports.postEditProduct = (req, res, next) => {
     productId = req.body.productId,
     title = req.body.title,
     price = +req.body.price,
-    imageUrl = req.body.imageUrl,
+    image = req.file,
     description = req.body.description;
 
   Product
@@ -110,7 +121,6 @@ exports.postEditProduct = (req, res, next) => {
             product: {
               title,
               price,
-              imageUrl,
               description,
               _id: product._id.toString()
             },
@@ -120,7 +130,9 @@ exports.postEditProduct = (req, res, next) => {
 
       product.title = title;
       product.price = price;
-      product.imageUrl = imageUrl;
+      if (image) {
+        product.imageUrl = image.path;
+      }
       product.description = description;
       return product.save()
         .then(() => res.redirect('/admin/products'))

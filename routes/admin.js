@@ -14,10 +14,6 @@ const productValidation = [
     .trim()
     .isLength({ min: 3, max: 20 })
     .withMessage('Product title should have more than 3 and less than 20 symbols and only letters or digits'),
-  body('imageUrl')
-    .isURL()
-    .trim()
-    .withMessage('Incorrect image URL format'),
   body('price')
     .isFloat()
     .withMessage('Invalid price'),
