@@ -237,3 +237,26 @@ exports.getInvoice = (req, res, next) => {
     next(error);
   });
 };
+
+exports.getCheckout = (req, res, next) => {
+  req
+    .user
+    .populate('cart.items.product')
+    .execPopulate()
+    .then(user => {
+      const products = user.cart.items;
+      let totalSum = products.reduce((acc, curr) => acc + curr.product.price, 0);
+
+      res.render('shop/checkout', {
+        pageTitle: 'Checkout',
+        path: '/checkout',
+        products,
+        totalSum
+      });
+    })
+    .catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      next(error);
+    });
+}
