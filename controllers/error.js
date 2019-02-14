@@ -9,7 +9,7 @@ exports.get404 = (req, res) => {
 
 exports.getError = (err, req, res, next) => {
   res
-    .status(err.httpStatusCode)
+    .status(err.httpStatusCode ? err.httpStatusCode : 500)
     .render('error', {
       isAuthenticated: req.session.isLoggedIn,
       pageTitle: `Error${err.httpStatusCode ? ' ' + err.httpStatusCode : ''}`,
