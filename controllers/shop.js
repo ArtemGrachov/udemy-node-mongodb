@@ -263,7 +263,7 @@ exports.getCheckout = (req, res, next) => {
     .execPopulate()
     .then(user => {
       const products = user.cart.items;
-      let totalSum = products.reduce((acc, curr) => acc + curr.product.price, 0) * 100;
+      let totalSum = products.reduce((acc, curr) => acc + curr.product.price, 0);
 
       res.render('shop/checkout', {
         pageTitle: 'Checkout',
