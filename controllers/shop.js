@@ -1,4 +1,6 @@
 const
+  fs = require('fs'),
+  path = require('path'),
   Product = require('../models/product'),
   Order = require('../models/order');
 
@@ -142,4 +144,39 @@ exports.getOrders = (req, res, next) => {
       error.httpStatusCode = 500;
       next(error);
     });
+};
+
+exports.getInvoice = (req, res, next) => {
+  const orderId = req.params.orderId;
+  Order
+  .findById(orderId)
+  .then(order => {
+    if (!order) {
+      const err = new Error('No order found.');
+      err.httpStatusCode = 404;
+      return next(err);
+    }
+
+    if (order.user.userId.toString() !== req.user._id.toString()) {
+      const err = new Error('Unauthorized');
+      err.httpStatusCode = 401;
+      return next(err);
+    }
+
+    const invoiceName = `invoice-${orderId}.pdf`;
+    const invoicePath = path.join('data', 'invoices', invoiceName);
+    fs.readFile(invoicePath, (err, data) => {
+      if (err) {
+        return next(err);
+      }
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="${invoiceName}"`);
+      res.send(data);
+    })
+  })
+  .catch(err => {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    next(error);
+  });
 };
