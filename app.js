@@ -32,6 +32,8 @@ const adminRoutes = require('./routes/admin'),
   authRoutes = require('./routes/auth');
 
 const errorController = require('./controllers/error');
+const shopController = require('./controllers/shop');
+const isAuth = require('./middleware/is-auth');
 
 app.use(bodyParser.urlencoded({
   extended: false
@@ -68,9 +70,6 @@ app.use(
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-const csrfProtection = csrf();
-
-app.use(csrfProtection);
 app.use(flash());
 
 const User = require('./models/user');
@@ -79,18 +78,23 @@ app.use((req, res, next) => {
   if (!req.session.user) {
     return next();
   }
-
+  
   User
-    .findById(req.session.user._id)
-    .then(user => {
-      if (!user) return next();
-      req.user = user;
-      next();
-    })
-    .catch(err => {
-      throw new Error(err);
-    })
+  .findById(req.session.user._id)
+  .then(user => {
+    if (!user) return next();
+    req.user = user;
+    next();
+  })
+  .catch(err => {
+    throw new Error(err);
+  })
 })
+
+app.post('/create-order', isAuth, shopController.postOrder);
+
+const csrfProtection = csrf();
+app.use(csrfProtection);
 
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;

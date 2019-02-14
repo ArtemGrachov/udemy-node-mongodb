@@ -25,6 +25,20 @@
         <h2>
           Total: <%= totalSum %>
         </h2>
+        <div>
+          <form action="/create-order" method="POST">
+            <script
+              src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+              data-key="pk_test_zwKpkr81dSeUF18GDlqKixKa"
+              data-amount="<%= totalSum %>"
+              data-name="Test Shop"
+              data-description="All the items you ordered"
+              data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+              data-locale="auto"
+              data-curency="usd">
+            </script>
+          </form>
+        </div>
       </div>
     <% } else { %>
       <h1>No products in cart</h1>

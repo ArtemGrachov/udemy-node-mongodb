@@ -8,6 +8,9 @@ exports.get404 = (req, res) => {
 }
 
 exports.getError = (err, req, res, next) => {
+  console.log('--------------------------------------------------')
+  console.log(err);
+  console.log('--------------------------------------------------')
   res
     .status(err.httpStatusCode ? err.httpStatusCode : 500)
     .render('error', {

@@ -4,7 +4,8 @@ const
   PDFDocument = require('pdfkit'),
   Product = require('../models/product'),
   Order = require('../models/order'),
-  paginationHelper = require('../util/pagination');
+  paginationHelper = require('../util/pagination'),
+  stripe = require('stripe')('sk_test_ujIbOcP3cygAhSyViPexHpMg');
 
 const ITEMS_PER_PAGE = 2;
 
@@ -131,11 +132,13 @@ exports.postCartDeleteProduct = (req, res, next) => {
 }
 
 exports.postOrder = (req, res, next) => {
+  let user;
   req
     .user
     .populate('cart.items.product')
     .execPopulate()
-    .then(user => {
+    .then(userDoc => {
+      user = userDoc;
       const products = user.cart.items.map(item => {
         return {
           quantity: item.quantity,
@@ -146,14 +149,29 @@ exports.postOrder = (req, res, next) => {
       });
       const order = new Order({
         user: {
-          email: req.user.email,
-          userId: req.user._id
+          email: user.email,
+          userId: user._id
         },
         products: products
       })
       return order.save()
     })
-    .then(result => req.user.clearCart())
+    .then(order => {
+      const source = req.body.stripeToken;
+      const amount = user.cart.items.reduce((acc, curr) => acc + curr.product.price, 0) * 100;
+      const charge = stripe
+        .charges
+        .create({
+          amount,
+          source,
+          currency: 'usd',
+          description: 'Demo order',
+          metadata: {
+            order_id: order._id.toString()
+          }
+        });
+      return req.user.clearCart();
+    })
     .then(result => res.redirect('/orders'))
     .catch(err => {
       const error = new Error(err);
@@ -245,7 +263,7 @@ exports.getCheckout = (req, res, next) => {
     .execPopulate()
     .then(user => {
       const products = user.cart.items;
-      let totalSum = products.reduce((acc, curr) => acc + curr.product.price, 0);
+      let totalSum = products.reduce((acc, curr) => acc + curr.product.price, 0) * 100;
 
       res.render('shop/checkout', {
         pageTitle: 'Checkout',
